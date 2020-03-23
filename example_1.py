@@ -5,9 +5,10 @@ from googleapiclient.errors import HttpError
 from googleapiclient import discovery
 from httplib2 import Http
 import pandas as pd
-import example_3  # My own function library
 import time
 import sys
+
+import example_3  # My own function library
 
 engine = example_3.engine()
 offers_ids = pd.read_sql("""SELECT * FROM offers_ids""", engine)
@@ -54,11 +55,7 @@ def read_spreadsheet_id(name):
         
 def read_sheet_id(spreadsheet_id, name, page):
     if lowercase_tarnslation(page) in offers_ids.columns:
-        sheet_id = offers_ids.loc[offers_ids['name'] == name][lowercase_tarnslation(page)].values[0]
-    else:
-        return create_sheet(spreadsheet_id, name, page)
-    if sheet_id is not None:
-        return sheet_id
+        return offers_ids.loc[offers_ids['name'] == name][lowercase_tarnslation(page)].values[0]
     else:
         return create_sheet(spreadsheet_id, name, page)
         
@@ -143,6 +140,6 @@ def offers_list(page):
         sheets_update(name, f'{page} (roi)')
         sheets_update(name, f'{page} (roi by offer)')
 
-offers_list(str(pd.Timestamp.today())[:7])
-if 20 >= int(str(pd.Timestamp.today())[8:10]) >= 1:
+offers_list(pd.Timestamp.today().strftime('%Y-%m'))
+if 20 >= pd.Timestamp.today().day >= 1:
     offers_list((pd.to_datetime(str(pd.Timestamp.today())[:7] + '-01') - pd.Timedelta(1)).strftime('%Y-%m'))
