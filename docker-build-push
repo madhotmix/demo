@@ -1,0 +1,21 @@
+#!/bin/sh -e
+
+cd "$(dirname "$0")"
+
+REGISTRY="dckr.domain.com"
+ PROJECT="$(git config --local remote.origin.url | awk -F '[/.]' '{ print $( NF - 1 ) }')"
+
+case $# in
+   0 ) VER="$(git tag --sort=taggerdate | tail -1)" ;;
+   1 ) VER="$1" ;;
+   * ) echo "Usage: ${0##*/} [version]" 1>&2 ; exit 1 ;;
+esac
+
+git checkout "$VER"
+
+echo "Build and push version $VER ..."
+
+docker build -t "$REGISTRY/$PROJECT:$VER" .
+docker push     "$REGISTRY/$PROJECT:$VER"
+
+## END ##
